@@ -4,6 +4,7 @@ const passport = require('passport');
 
 const User = require('../models/User');
 const Case = require('../models/Case');
+const Blog = require('../models/Blog');
 
 const router = express.Router();
 const {isAdmin} = require('../middleware');
@@ -187,6 +188,51 @@ router.get("/cases/:id", isAdmin, (req, res) => {
             }
         });
     }
+ });
+
+ router.get("/blogs/new", isAdmin, (req, res) => {
+    res.render("newBlog");
+});
+
+router.post("/blogs", isAdmin, (req, res) => {
+    Blog.create(req.body.blog, (err, newBlog) => {
+        if(err){
+            res.render("newBlog");
+        } else {
+            res.redirect("/blogs");
+        }
+    });
+});
+
+router.get("/blogs/:id/edit", isAdmin, (req, res) => {
+    Blog.findById(req.params.id, (err, foundBlog) => {
+        if(err){
+            res.redirect("/blogs");
+        } else {
+            res.render("editBlog", {blog: foundBlog});
+        }
+    });
+});
+
+router.put("/blogs/:id", function(req, res){
+    req.body.blog.body = req.sanitize(req.body.blog.body);
+   Blog.findByIdAndUpdate(req.params.id, req.body.blog, (err, updatedBlog) => {
+      if(err){
+          res.redirect("/blogs");
+      }  else {
+          res.redirect("/blogs/" + req.params.id);
+      }
+   });
+});
+
+app.delete("/blogs/:id", (req, res) => {
+    Blog.findByIdAndRemove(req.params.id, (err) => {
+        if(err){
+            res.redirect("/blogs");
+        } else {
+            res.redirect("/blogs");
+        }
+    })
  });
 
 
