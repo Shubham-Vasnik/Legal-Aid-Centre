@@ -9,7 +9,7 @@ const CaseSchema = new mongoose.Schema({
         name: String
     },
     subject:{ type: String,
-        required:true,
+        required:false,
     },
     details: { type:String,
         required:false,
@@ -24,6 +24,10 @@ const CaseSchema = new mongoose.Schema({
     status:{
         type:String,
         default:"open"
+    },
+    attachement:{
+        type:String,
+        required:false,
     },
     created: {type: Date, 
         default: Date.now}

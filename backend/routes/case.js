@@ -1,16 +1,33 @@
 const express = require('express');
+const multer = require('multer');
+const path = require('path');
+
 const { isSignedIn } = require('../middleware');
 
 const Case = require('../models/Case');
 
+const storage = multer.diskStorage({
+    destination:'./public/uploads',
+    filename: function(req, file, cb){
+        cb(null, file.fieldname + '-' + req.user._id + '-' + Date.now() + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({
+    storage:storage,
+    limits:{fieldSize:10000000}
+}).single('attachement');
+
 const router = express.Router();
 
+router.use(upload);
 
 router.get('/new',isSignedIn, (req,res) => {
     res.render('cases/new');
 });
 
-router.post("/", isSignedIn, (req, res) => {
+router.post("/", isSignedIn, async (req, res) => {
+
 
     let subject = req.body.subject;
     let details = req.body.details;
@@ -23,14 +40,26 @@ router.post("/", isSignedIn, (req, res) => {
         id: req.user._id,
         name: req.user.firstName + " " + req.user.lastName,
     }
-    const newCase = {subject,details,contactEmail,mobileNo,user}
-    Case.create(newCase, (err, newCase)  => {
+    var attachement;
+    await upload(req, res, (err) => {
         if(err){
-            console.log(err);
-        } else {
-            console.log(newCase);
-            req.flash('success_msg', "Your case is Registered");
+            req.flash('error_msg', "File Upload Error");
             res.redirect('/cases/new');
+            console.log(err);
+        }
+        else{
+            console.log(req.file);
+            attachement = "uploads/" + req.file.filename;
+            const newCase = {subject,details,contactEmail,mobileNo,user,attachement}
+            Case.create(newCase, (err, newCase)  => {
+                if(err){
+                    console.log(err);
+                } else {
+                    console.log(newCase);
+                    req.flash('success_msg', "Your case is Registered");
+                    res.redirect('/cases/new');
+                }
+            });
         }
     });
 });

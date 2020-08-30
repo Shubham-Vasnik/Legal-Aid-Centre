@@ -225,7 +225,7 @@ router.put("/blogs/:id", function(req, res){
    });
 });
 
-app.delete("/blogs/:id", (req, res) => {
+router.delete("/blogs/:id", (req, res) => {
     Blog.findByIdAndRemove(req.params.id, (err) => {
         if(err){
             res.redirect("/blogs");

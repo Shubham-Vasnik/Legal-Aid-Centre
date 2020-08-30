@@ -5,6 +5,7 @@ const flash = require('connect-flash');
 const session = require('express-session');
 const passport = require('passport');
 const expressSanitizer = require('express-sanitizer');
+const multer = require('multer');
 
 const indexRoutes = require('./routes/index');
 const usersRoutes = require('./routes/users');
@@ -15,6 +16,8 @@ require('./passport')(passport);
 
 
 const app = express();
+
+const upload = multer();
 
 const PORT = process.env.PORT || 3001;
 
@@ -32,8 +35,10 @@ mongoose.connect("mongodb://localhost:27017/legal_aid_centre",{useUnifiedTopolog
 app.use(expressLayouts);
 app.set('view engine', 'ejs' );
 
-// Bodyparser
+app.use(express.static('public'));
 
+// Bodyparser
+app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 
 

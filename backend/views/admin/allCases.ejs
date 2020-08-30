@@ -17,6 +17,7 @@
                 <th>Mobile No.</th>
                 <th>Status</th>
                 <th>Created on</th>
+                <th>Attachement</th>
               </tr>
             <% allCases.forEach(function(acase){ %>
               <tr>
@@ -25,6 +26,12 @@
                 <td><%=acase.mobileNo%></td>
                 <td><%=acase.status.toUpperCase()%></td>
                 <td><%=acase.created.toDateString()%></td>
+                <td><% if (acase.attachement) { %>
+                  <a href="/<%=acase.attachement%>">attachment</a>
+                  <%} else { %>
+                  <span>No attachment</span>
+                  <% } %>
+                </td>
               </tr>
             <% }); %>
             </table>
