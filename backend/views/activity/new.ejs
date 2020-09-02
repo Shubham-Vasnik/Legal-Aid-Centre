@@ -1,0 +1,22 @@
+
+<div class="container mt-5" style="margin-bottom:100px;">
+  <h2 style="text-align:center ;">Create a Activity</h2>
+  <%- include('../partials/messages'); %>
+  <form class="md-5" action="/admin/activities" method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+      <label for="title">Title</label>
+      <input type="text" class="form-control" id="title" name="title" placeholder="Enter Title">
+    </div>
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea class="form-control" name="description" rows="3"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="post-image">Image</label>
+      <input type="file" class="form-control-file" name="post-image">
+    </div>
+    <div class="form-group">
+      <button type="submit" class="btn btn-lg btn-primary float-right">Create Post</button>
+    </div>
+  </form>
+</div>

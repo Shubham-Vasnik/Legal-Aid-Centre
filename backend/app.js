@@ -6,6 +6,7 @@ const session = require('express-session');
 const passport = require('passport');
 const expressSanitizer = require('express-sanitizer');
 const multer = require('multer');
+const methodOverride = require('method-override');
 
 const indexRoutes = require('./routes/index');
 const usersRoutes = require('./routes/users');
@@ -64,7 +65,16 @@ app.use((req, res, next) => {
     res.locals.error_msg = req.flash('error_msg');
     res.locals.error = req.flash('error');
     next();
-})
+});
+
+app.use(function(req, res, next){
+    res.locals.user = req.user;
+    next();
+ });
+
+ app.use(methodOverride("_method"));
+
+
 
 
 // Routes

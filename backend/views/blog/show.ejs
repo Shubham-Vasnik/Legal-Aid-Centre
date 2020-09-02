@@ -1,0 +1,56 @@
+<style>
+    .postcontent{
+		min-height: 150px;
+		font-size: 24px!important;
+	}
+    .post-image img {
+        max-width: 100%;
+    }
+
+    .post-title{
+        margin-top: 24px;
+    }
+    .post-image{
+        margin-top: 24px;
+    }
+    .post-content{
+        font-size: 1.2rem;
+        margin-top: 42px;
+        margin-bottom: 24px;
+        padding-bottom: 12px;
+    }
+
+    .inline-form{
+        display: inline;
+    }
+</style>
+
+
+
+<div class="container">
+    <div class="row justify-content-md-center">
+        <div class="col-md-auto">
+            <h1 class="post-title"><%=post.title%></h1>
+                <div class="date postdate">
+                    Posted by <%=post.author%> on
+                    <%=post.created %>
+                </div>
+                <% if (post.image) { %>
+                <div class ="post-image">
+                    <img  src="/<%=post.image%>" alt="post image">
+                </div>
+                <%}%>
+                <div class="post-content"> 
+                    <p><%=post.body%></p>
+                </div> 
+            <% if (user && user.role === 'admin') {%>
+                <a class="btn btn-warning" href="/admin/blogs/<%=post._id%>/edit"><i class="fas fa-pencil-alt"></i></a>
+                <form method="POST" action="/admin/blogs/<%=post._id%>?_method=DELETE" class="inline-form">
+                    <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i></button>
+                </form>
+            <%}%>
+            <hr>
+    </div>
+</div>
+</div>
+

@@ -22,7 +22,7 @@ const router = express.Router();
 
 router.use(upload);
 
-router.get('/new',isSignedIn, (req,res) => {
+router.get('/new', (req,res) => {
     res.render('cases/new');
 });
 

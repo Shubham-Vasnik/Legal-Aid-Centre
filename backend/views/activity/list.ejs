@@ -1,0 +1,25 @@
+<div class="centerstage container mt-5 mb-5">
+    <div class="row">
+        <% posts.forEach(function(post){ %>
+        <div class="col-md-3 col-sm-6">
+            <a href="/blogs/<%=post._id%>">
+            <div class="card post-card">
+            <% if (post.image) {%>
+                <img src="/<%=post.image%>" class="card-img-top" alt="post image">
+            <% } %>
+                <div class="card-body">
+                <div class="card-title">
+                <h4><a href="/activities/<%=post._id%>"> <%=post.title%> </a></h4>
+                </div>
+                <div class="card-text">
+                <div class="date">
+                    <p>Published on:  <%=post.created%> </p>
+                </div>
+                </div> 
+            </div>
+            </div>
+            </a>          
+        </div>
+        <% }); %>
+    </div>
+</div>

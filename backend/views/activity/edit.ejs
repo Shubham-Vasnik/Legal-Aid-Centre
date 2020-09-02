@@ -1,0 +1,23 @@
+
+<div class="container mt-5" style="margin-bottom:100px;">
+    <h2 style="text-align:center ;">Edit Activity <%=post.title%></h2>
+    <%- include('../partials/messages'); %>
+    <form class="md-5" action="/admin/activities/<%=post._id%>?_method=PUT" method="POST" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" class="form-control" id="title" name="title" value="<%=post.title%>">
+      </div>
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea class="form-control" name="description" rows="3" ><%=post.body%></textarea>
+      </div>
+      <div class="form-group">
+        <label for="post-image">Image</label>
+        <input type="file" class="form-control-file" name="post-image" value="<%=post.image%>">
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn btn-lg btn-primary float-right">Edit Post</button>
+      </div>
+    </form>
+  </div>
+  

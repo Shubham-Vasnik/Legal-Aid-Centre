@@ -1,14 +1,34 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
+const multer = require('multer');
+const path = require('path');
 
 const User = require('../models/User');
 const Case = require('../models/Case');
-const Blog = require('../models/Blog');
+const Post = require('../models/Post');
+const Activity = require('../models/Activity');
 
 const router = express.Router();
 const {isAdmin} = require('../middleware');
 
+const storage = multer.diskStorage({
+    destination:'./public/uploads/postimages',
+    filename: function(req, file, cb){
+        cb(null, file.fieldname + '-' + req.user._id + '-' + Date.now() + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({
+    storage:storage,
+    limits:{fieldSize:10000000}
+}).single('post-image');
+
+
+router.use(upload);
+
+
+// Auth
 router.get('/', isAdmin, (req,res) => {
     res.send("Admin");
 });
@@ -102,6 +122,8 @@ router.post('/register',isAdmin, (req,res) => {
     
 });
 
+// Cases
+
 router.get('/cases', isAdmin, (req, res) => {
 
     if(req.query.search){
@@ -190,43 +212,85 @@ router.get("/cases/:id", isAdmin, (req, res) => {
     }
  });
 
- router.get("/blogs/new", isAdmin, (req, res) => {
-    res.render("newBlog");
+
+// Blog 
+
+router.get("/blogs/new", isAdmin, (req, res) => {
+    res.render("blog/new");
 });
 
 router.post("/blogs", isAdmin, (req, res) => {
-    Blog.create(req.body.blog, (err, newBlog) => {
+    console.log(req.body)
+    let title = req.body.title;
+    let body = req.body.description;
+    let author = req.user.firstName + " " + req.user.lastName;
+    let image;
+    upload(req, res, (err) => {
         if(err){
-            res.render("newBlog");
-        } else {
-            res.redirect("/blogs");
+            req.flash('error_msg', "File Upload Error");
+            res.redirect('/admin/blog/new');
+            console.log(err);
         }
-    });
+        else{
+            if(req.file){
+                image = "uploads/postimages/" + req.file.filename;
+                }
+            else{
+                image="";
+            }
+            const newPost = {title,body,image,author}
+            Post.create(newPost, (err, newPost) => {
+                if(err){
+                    res.render("blog/new");
+                } else {
+                    res.redirect("/blogs");
+                }
+            });
+    }});
 });
 
 router.get("/blogs/:id/edit", isAdmin, (req, res) => {
-    Blog.findById(req.params.id, (err, foundBlog) => {
+    Post.findById(req.params.id, (err, foundPost) => {
         if(err){
             res.redirect("/blogs");
         } else {
-            res.render("editBlog", {blog: foundBlog});
+            res.render("blog/edit", {post: foundPost});
         }
     });
 });
 
 router.put("/blogs/:id", function(req, res){
-    req.body.blog.body = req.sanitize(req.body.blog.body);
-   Blog.findByIdAndUpdate(req.params.id, req.body.blog, (err, updatedBlog) => {
-      if(err){
-          res.redirect("/blogs");
-      }  else {
-          res.redirect("/blogs/" + req.params.id);
-      }
-   });
+
+    let title = req.body.title;
+    let body = req.body.description;
+    let image;
+    upload(req, res, (err) => {
+        if(err){
+            req.flash('error_msg', "File Upload Error");
+            res.redirect(`/admin/blogs/${req.params.id}/edit`);
+            console.log(err);
+        }
+        else{
+            if(req.file){
+            image = "uploads/postimages/" + req.file.filename;
+            }
+            else{
+                image="";
+            }
+            const post = {title,body,image}
+    
+            Post.findByIdAndUpdate(req.params.id, post, (err, updatedPost) => {
+                if(err){
+                    res.redirect("/blogs");
+                }  else {
+                    res.redirect("/blogs/" + req.params.id);
+                }
+            });
+    }});
 });
 
 router.delete("/blogs/:id", (req, res) => {
-    Blog.findByIdAndRemove(req.params.id, (err) => {
+    Post.findByIdAndRemove(req.params.id, (err) => {
         if(err){
             res.redirect("/blogs");
         } else {
@@ -235,6 +299,90 @@ router.delete("/blogs/:id", (req, res) => {
     })
  });
 
+
+// Activity
+
+router.get("/activities/new", isAdmin, (req, res) => {
+    res.render("activity/new");
+});
+
+router.post("/activities", isAdmin, (req, res) => {
+    let title = req.body.title;
+    let body = req.body.description;
+    let image;
+    upload(req, res, (err) => {
+        if(err){
+            req.flash('error_msg', "File Upload Error");
+            res.redirect('/admin/activities/new');
+            console.log(err);
+        }
+        else{
+            if(req.file){
+                image = "uploads/postimages/" + req.file.filename;
+                }
+            else{
+                image="";
+            }
+            const newActivity = {title,body,image}
+            Activity.create(newActivity, (err, newPost) => {
+                if(err){
+                    res.render("activity/new");
+                } else {
+                    res.redirect("/activities");
+                }
+            });
+    }});
+});
+
+router.get("/activities/:id/edit", isAdmin, (req, res) => {
+    Activity.findById(req.params.id, (err, foundActivity) => {
+        if(err){
+            res.redirect("/activities");
+        } else {
+            res.render("activity/edit", {post: foundActivity});
+        }
+    });
+});
+
+router.put("/activites/:id", function(req, res){
+
+    let title = req.body.title;
+    let body = req.body.description;
+    let image;
+    upload(req, res, (err) => {
+        if(err){
+            req.flash('error_msg', "File Upload Error");
+            res.redirect('/admin/activities/new');
+            console.log(err);
+        }
+        else{
+            if(req.file){
+                image = "uploads/postimages/" + req.file.filename;
+                }
+            else{
+                image="";
+            }
+            const activity = {title,body,image}
+    
+            Activity.findByIdAndUpdate(req.params.id, activity, (err, updatedPost) => {
+                if(err){
+                    res.redirect("/activities");
+                }  else {
+                    res.redirect("/activities/" + req.params.id);
+                }
+    })}
+    });
+});
+
+router.delete("/activities/:id", (req, res) => {
+    Activity.findByIdAndRemove(req.params.id, (err) => {
+        if(err){
+            res.redirect("/activities");
+        } else {
+            res.redirect("/activities");
+        }
+    })
+ });
 
 router.get('/logout',(req, res) => {
     req.logout();
